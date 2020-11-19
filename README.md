@@ -27,6 +27,9 @@ Cryptograpically Secure Pseudorandom Bit Generators
 
     If the seed x0 is too small then my implementation uses sha256 hash repeatedly to make a
     r or bigger bit number (where r = N-k).
+    
+    "RSA-like primes" are recommended - I used Gordon's algorithm (for "Strong primes"). 
+    It didn't noticeably improve the number of times a e can not be found.
 
 ########################## Python Requirements:##########################
 
