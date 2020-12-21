@@ -71,6 +71,11 @@ All need a chi square distribution - I made it using gamma functions
     distribution if (n-d) >= 10. As small value of A(d) are as unexpected as big a
     two-sided test should be used.
 
+    * FIPS 140-1
+
+    Do 4 of the statistical tests on a random binary sequence of length = 20000 and check if
+    the sequence passes all of them.
+
 ########################## Python Requirements:##########################
 
     * sympy

@@ -97,3 +97,35 @@ def autocortest(s, d):
     A = sum([ s[i] ^ s[i+d] for i in range(n-d) ])
     X_5 = 2 * (A - (n-d)/2) / math.sqrt(n-d)
     return X_5
+
+
+def passfips(s):
+    """Given a binary sequence s of length=20000 do 4 statistical tests per FIPS 140-1.
+       Returns True if passes all 4, otherwise False  """
+    if len(s) < 20000: # not enough bits for FIPS tests
+        return False
+    s = s[:20000] # use first 20K bits if bigger
+    n1 = s.count(1)
+    if n1 <= 9654 or n1 >= 10346:
+        return False
+    ptest = pokertest(s, 4)
+    if ptest <= 1.03 or ptest >= 57.4:
+        return False
+    B, G = blocksandgaps(s) # dictionaries with counts for blocks & gaps of all observed lengths
+    if B.get(1, 0) < 2267 or B.get(1, 0) > 2733 or  G.get(1, 0) < 2267 or G.get(1, 0) > 2733:
+        return False
+    if B.get(2, 0) < 1079 or B.get(2, 0) > 1421 or  G.get(2, 0) < 1079 or G.get(2, 0) > 1421:
+        return False
+    if B.get(3, 0) <  502 or B.get(3, 0) >  748 or  G.get(3, 0) <  502 or G.get(3, 0) >  748:
+        return False
+    if B.get(4, 0) <  223 or B.get(4, 0) >  402 or  G.get(4, 0) <  223 or G.get(4, 0) >  402:
+        return False
+    if B.get(5, 0) <   90 or B.get(5, 0) >  223 or  G.get(5, 0) <   90 or G.get(5, 0) >  223:
+        return False
+    B6 = sum([ B.get(i, 0) for i in B.keys() if i >= 6 ]) # counts of blocks of len >= 6
+    G6 = sum([ G.get(i, 0) for i in G.keys() if i >= 6 ]) # counts of gaps of len >= 6
+    if B6 < 90 or B6 > 223 or G6 < 90 or G6 > 223:
+        return False
+    if max(G) >= 34 or max(B) >= 34: # long runs test: no run of length >= 34
+        return False
+    return True

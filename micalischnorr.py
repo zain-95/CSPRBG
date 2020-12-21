@@ -13,12 +13,13 @@ automaxscore = 2.3263 # normal significance level of alphasig
 usestrongprimes = False
 
 failedprimes = []
+failedfips = []
 failedserial = []
 failedpoker = []
 
 random.seed(seed)
 
-print("\nMaking {} random streams of 10000 bit using MS_PRBG...".format(ntrials))
+print("\nMaking {} random streams of 20000 bit using MS_PRBG...".format(ntrials))
 i = 0
 while i < ntrials:
     if usestrongprimes:
@@ -26,11 +27,14 @@ while i < ntrials:
     else:
         p,q = randprime(primesize), randprime(primesize)
     x_0 = random.getrandbits(primesize)
-    bstream = ms_prbg(p, q, x_0, 10000)
+    bstream = ms_prbg(p, q, x_0, 20000)
     if not bstream:
         failedprimes.append((p, q))
         continue
     i += 1
+    if not passfips(bstream):
+        failedfips.append((p, q, x_0))
+        print("  Found a case that failed FIPS.")
     pscore = pokertest(bstream, 4)
     if chiprob(2**4 - 1, pscore) < alphasig:
         failedpoker.append((p, q, x_0))
@@ -42,8 +46,7 @@ while i < ntrials:
 
 print("\nTo get to {0} PRBG found {1} prime pairs (of size {2} bit) where a PRBG can't be made."
       "(Failure rate of {3:4.3}%)\n ".format(ntrials, len(failedprimes), primesize, 100.0 * len(failedprimes) / (ntrials + len(failedprimes))))
-print("Of the {} PRBG made found {} that failed the poker test at {} significance level. "
-      "Expected to find {}.".format(ntrials, len(failedpoker), alphasig, alphasig * ntrials))
+print("Of the {} PRBG made found {} that failed the FIPS test.".format(ntrials, len(failedfips)))
 print("Of the {} PRBG made found {} that failed the serial test at {} significance level. "
       "Expected to find {}.".format(ntrials, len(failedserial), alphasig, alphasig * ntrials))
 
