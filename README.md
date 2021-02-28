@@ -29,7 +29,24 @@ Cryptograpically Secure Pseudorandom Bit Generators
     r or bigger bit number (where r = N-k).
     
     "RSA-like primes" are recommended - I used Gordon's algorithm (for "Strong primes"). 
-    It didn't noticeably improve the number of times a e can not be found.
+    It didn't noticeably improve the number of times a e cannot be found.
+
+########################## Blum-Blum-Shub ########################## 
+
+    * Or the x**2 mod n generator.
+    
+    * My implementation takes 2 primes p & q, a starting seed s and the number of output bit
+      numbit.
+      
+        - n = p * q
+        - p & q is 3 mod 4
+        - s is in interval [1, n-1]
+        - s is gcd(s,n) == 1
+
+    * x_(i+1) = x_i**2 mod n
+
+        - x_0 = s**2 mod n
+        - z_i output is the least significant bit of x_i for 1 <= i < numbits
 
 ########################## Five basic statistical tests ##########################
 

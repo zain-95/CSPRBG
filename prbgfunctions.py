@@ -37,6 +37,32 @@ def ms_prbg(p, q, x_0, numbits, usehash = True, printerror = False):
         randbits_ms += int_to_bits(z, k)
     return randbits_ms[:numbits]
 
+def bbs_prbg(p, q, s, numbits, printerror = False):
+    """Blum-Blum-Shub PRBG:
+       Primes p & q give modulus n = p * q. p & q is 3 mod 4.
+       s: in interval [1, n-1] and gcd(s, n) = 1
+       Sequence is x_(i+1) = x_i**2 mod n, x_0 = s**2 mod n
+       Output is z_i, the least significant bit of x_i for 1 <= i < numbits."""
+    if p%4 != 3 or q%4 != 3:
+        if printerror:
+            print("ERROR: Primes are not congruent to 3 mod 4")
+        return False
+    n = p * q
+    if s < 1 or s > n-1:
+        if printerror:
+            print("ERROR: Starting seed is not in interval [1, n-1]")
+    if gcd(s, n) != 1:
+        if printerror:
+            print("ERROR: Starting seed is not coprime to modulus n = p * q")
+        return False
+    x = pow(s,2,n) # x_0
+    randbits_bbs = [] # array for the bits that make the random output sequence
+    for i in range(numbits):
+        x = pow(x, 2, n)
+        z = x & 1 # least significant bit
+        randbits_bbs += int_to_bits(z, 1)
+    return randbits_bbs
+
 def randprime(k):
     """Returns a random prime of k bit """
     p = 0
