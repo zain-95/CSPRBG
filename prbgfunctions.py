@@ -84,7 +84,7 @@ def inttobytes(num):
 
 def bits_to_int(x):
     """Given an array of 0's & 1's returns the integer corresponding to the binary representation """
-    return sum(b << i for i, b in enumerate(x))
+    return sum(b << i for i, b in enumerate(reversed(x)))
 
 def sha256hash(num):
     """Returns the sha256 hash (as a hex string) of the given int """
