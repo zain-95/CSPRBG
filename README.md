@@ -93,6 +93,12 @@ All need a chi square distribution - I made it using gamma functions
     Do 4 of the statistical tests on a random binary sequence of length = 20000 and check if
     the sequence passes all of them.
 
+########################## Multivarate Quadratic DRBG ##########################
+
+    * MQ_DRBG is based on iteration of a random multivarate quadratic system.
+
+    * There are fixed lengths for the MQ_DRBG. My initial code handles the files. 
+
 ########################## Python Requirements:##########################
 
     * sympy
