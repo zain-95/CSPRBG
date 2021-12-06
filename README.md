@@ -97,7 +97,9 @@ All need a chi square distribution - I made it using gamma functions
 
     * MQ_DRBG is based on iteration of a random multivarate quadratic system.
 
-    * There are fixed lengths for the MQ_DRBG. My initial code handles the files. 
+    * There are fixed lengths for the MQ_DRBG. My initial code handles the files.
+
+    * Two functions suggested by the standard - field_vector() and flatten()
 
 ########################## Python Requirements:##########################
 
