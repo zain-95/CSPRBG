@@ -101,6 +101,18 @@ All need a chi square distribution - I made it using gamma functions
 
     * Two functions suggested by the standard - field_vector() and flatten()
 
+    * Works for field size 1 (multiplation is more difficult for for other field sizes)
+
+    * Initialize state by hashing seed to get input vector of integers
+      - Apply equations from parameter file to random state
+        - Get two vectors of values from this
+          - Vector y is the new state vector
+          - Vector z is the output containing one block of bit to output
+      - If not enough bits produced, run again with the state just returned
+        - This will make another block of output
+
+    * The seed needs to be as large as the block length. Pad with 0s if it is not
+
 ########################## Python Requirements:##########################
 
     * sympy
