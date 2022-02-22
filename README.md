@@ -101,7 +101,7 @@ All need a chi square distribution - I made it using gamma functions
 
     * Two functions suggested by the standard - field_vector() and flatten()
 
-    * Works for field size 1 (multiplation is more difficult for for other field sizes)
+    * Works for all field sizes
 
     * Initialize state by hashing seed to get input vector of integers
       - Apply equations from parameter file to random state
@@ -112,6 +112,8 @@ All need a chi square distribution - I made it using gamma functions
         - This will make another block of output
 
     * The seed needs to be as large as the block length. Pad with 0s if it is not
+
+    * Generate 100 binary streams of 1000 bits to test
 
 ########################## Python Requirements:##########################
 

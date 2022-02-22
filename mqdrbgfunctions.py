@@ -30,9 +30,28 @@ def bfmult(a,b, field_size):
     """Multiplication of a and b over binary field of size field_size."""
     if field_size == 1:
         return a * b
+    elif field_size in [2,3,4,6]: # for field_size in [2,3,4,6], x**field_size becomes (x+1) = 0b11
+        pmod = 0b11
+    elif field_size == 8: # for field_size=8, x**8 reduces to x**4+x**3+x**2+1 = 0b11101
+        pmod = 0b11101
     else: 
-        print("ERROR: Field size {} not implemented".format(field_size))
+        print("ERROR: Unsupported field size: {}".format(field_size))
         exit(1)
+
+    fexp = 2**field_size
+    prod = 0
+    for i in range(field_size):
+        prod ^= (((a>>i) & 1) * b) << i
+    bfproduct = prod % fexp
+    highbits = prod // fexp
+    for i in range(field_size):
+        bfproduct ^= ((highbits>>i) & 1) * (pmod<<i)
+    while bfproduct >= fexp:
+        highbits = bfproduct // fexp
+        bfproduct = bfproduct % fexp
+        for i in range(field_size):
+            bfproduct ^= ((highbits>>i) & 1) * (pmod<<i)
+    return bfproduct
 
 def Evaluate_MQ(P, x, state_length = 272, block_length = 256, field_size = 1):
     """Given a state x as an array of bits and forward and output MQ equations in P, 

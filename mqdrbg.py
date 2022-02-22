@@ -6,6 +6,7 @@ from paramtable import paramdict
 requested_block_length = 256
 requested_strength = 256
 seed = 1
+rand_file = None
 ntrials = 100
 
 try:
