@@ -113,7 +113,7 @@ All need a chi square distribution - I made it using gamma functions
 
     * The seed needs to be as large as the block length. Pad with 0s if it is not
 
-    * Generate 100 binary streams of 1000 bits to test
+    * Generate 100 binary streams of 20000 bits and do the FIPS 140-1 tests on them
 
 ########################## Python Requirements:##########################
 
