@@ -30,11 +30,14 @@ def bfmult(a,b, field_size):
     """Multiplication of a and b over binary field of size field_size."""
     if field_size == 1:
         return a * b
-    elif field_size in [2,3,4,6]: # for field_size in [2,3,4,6], x**field_size becomes (x+1) = 0b11
+    elif field_size in [2,3,4]: # for field_size in [2,3,4], x**field_size becomes (x+1) = 0b11
         pmod = 0b11
+    elif field_size == 6: # for field_size=6, x**6 reduces to x**4+x**3+x+1 = 0b011011
+                          # (NOT x**6+x+1 as indicated by standard)
+        pmod = 0b011011
     elif field_size == 8: # for field_size=8, x**8 reduces to x**4+x**3+x**2+1 = 0b11101
         pmod = 0b11101
-    else: 
+    else:
         print("ERROR: Unsupported field size: {}".format(field_size))
         exit(1)
 
@@ -57,7 +60,9 @@ def Evaluate_MQ(P, x, state_length = 272, block_length = 256, field_size = 1):
     """Given a state x as an array of bits and forward and output MQ equations in P, 
          returns the next internal state and the output state."""
     P_vec = field_vector(P, field_size) # coefficients for MQ equations (as integer vector)
-    x_vec = field_vector(x, field_size) # input state x (as integer vector)
+    # input state x (as integer vector). Reversed since coefficient files expect least-significant bits *first*,
+    #     while test vectors have least-significant *last*; so reverse here, then reverse output after computations
+    x_vec = list(reversed(field_vector(x, field_size)))
     y_vec = field_vector([0] * state_length, field_size) # updated state (as integer vector)
     z_vec = field_vector([0] * block_length, field_size) # output block (as integer vector)
     n = state_length//field_size
@@ -66,29 +71,31 @@ def Evaluate_MQ(P, x, state_length = 272, block_length = 256, field_size = 1):
     for i in range(n): # compute new state using MQ equations
         for j in range(n): # nonlinear terms a_jk * x_j * x_k
             for k in range(j, n):
+                if field_size==1 and j==k: # for field size=1, x_j*x_j=x_j. do with linear terms below.
+                    continue
                 y_vec[i] = y_vec[i] ^ bfmult(P_vec[t], bfmult(x_vec[j], x_vec[k], field_size), field_size)
                 t += 1
-        if field_size > 1:
-            for j in range(n): # linear terms b_j * x_j
-                y_vec[i] = y_vec[i] ^ bfmult(P_vec[t], x_vec[j], field_size)
-                t += 1
+        for j in range(n): # linear terms b_j * x_j
+            y_vec[i] = y_vec[i] ^ bfmult(P_vec[t], x_vec[j], field_size)
+            t += 1
         y_vec[i] = (y_vec[i] ^ P_vec[t]) # constant term c
         t += 1
     for i in range(m): # compute new block using MQ equations
         for j in range(n): # nonlinear terms a_jk * x_j * x_k
             for k in range(j, n):
+                if field_size==1 and j==k: # for field size=1, x_j*x_j=x_j. do with linear terms below.
+                    continue
                 z_vec[i] = z_vec[i] ^ bfmult(P_vec[t], bfmult(x_vec[j],  x_vec[k], field_size), field_size)
                 t += 1
-        if field_size > 1:
-            for j in range(n): # linear terms b_j * x_j
-                z_vec[i] = z_vec[i] ^ bfmult(P_vec[t], x_vec[j], field_size)
-                t += 1
+        for j in range(n): # linear terms b_j * x_j
+            z_vec[i] = z_vec[i] ^ bfmult(P_vec[t], x_vec[j], field_size)
+            t += 1
         z_vec[i] = z_vec[i] ^ P_vec[t] # constant term c
         t += 1
-    return flatten(y_vec, field_size), flatten(z_vec, field_size)
+    return flatten(list(reversed(y_vec)), field_size), flatten(list(reversed(z_vec)), field_size)
 
 def MQ_DRBG(P, inx, numbits, state_length, block_length, field_size):
-    """Given a starting seed inx and coefficients of MQ equations in P, 
+    """Given a starting seed inx and coefficients of MQ equations in P,
        returns numbits of bits from MQ_DRBG using the state_length, block_length, and field_size. """
     x = inx[:]
     if len(x) < state_length: # if seed not large enough, pad with zeros

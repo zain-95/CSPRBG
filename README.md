@@ -101,7 +101,7 @@ All need a chi square distribution - I made it using gamma functions
 
     * Two functions suggested by the standard - field_vector() and flatten()
 
-    * Works for all field sizes
+    * Works for all field sizes - and there is an error in field size 6 from the specification and the test vectors
 
     * Initialize state by hashing seed to get input vector of integers
       - Apply equations from parameter file to random state
@@ -114,6 +114,23 @@ All need a chi square distribution - I made it using gamma functions
     * The seed needs to be as large as the block length. Pad with 0s if it is not
 
     * Generate 100 binary streams of 20000 bits and do the FIPS 140-1 tests on them
+
+    * Test vectors
+
+    I used the test vectors in the annex to the standard to check my code. The results did not match.
+    This is because there are mistakes in the standard. I have changed my code to make the test vectors work.
+
+    There is a problem with the endianness of the parameters and test vectors. If the state vector is like in the
+    standard, the results produced are wrong. If it is reversed before it goes into the MQ_DRBG and the output of the
+    MQ_DRBG is reversed then the results match the test vector.
+
+    The parameter files are not formatted in the way they are suppose to be. The process in the standard says that the
+    quadratic terms are listed with the non-linear terms, but to get the test vectors to match for field size 1 they
+    have to be read with the linear terms. The code now reads the parameters in a way that works with the test vectors.
+
+    The tests for field size 6 also did not work. This is because the irreducible polynomial for 6 in the standard is
+    x**6+x+1, but for the test vectors to work, the polynomial is x**6+x**4+x**3+x+1. Code now uses polynomial that works
+    with test vectors, not the one in the standard.
 
 ########################## Python Requirements:##########################
 
